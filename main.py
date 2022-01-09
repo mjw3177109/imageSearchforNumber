@@ -113,8 +113,8 @@ def print_dataset(mnist):
     #定义输出预测占位符 y_
     y_=tf.placeholder(tf.float32,[None,10])
     ##创建给tensorflow的训练模型时的参数数据字典
-    valid_feed_dict ={x:x_valid,y:y_valid}
-    test_feed_dict ={x:x_test,y:y_test}
+    valid_feed_dict ={x:x_valid,y_:y_valid}
+    test_feed_dict ={x:x_test,y_:y_test}
     #通过激活函数softmax的交叉熵来定义损失函数
     cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels=y_,logits=y))
     ###定义梯度下降优化器,根据学习率来梯度下降,并且下降过程中,损失值也越来越少
@@ -128,11 +128,72 @@ def print_dataset(mnist):
     print(accuracy)
 
     ##训练模型
+    iteration =0
+
+    test_model(accuracy, test_feed_dict)
+    #定义训练时的检查点
+    # saver =tf.train.Saver() #保存最佳点的模型
+    # #创建一个Tensorflow的会话
+    # with tf.Session() as sess:
+    #     # 初始化全局变量
+    #     sess.run(tf.global_variables_initializer())
+    #     ##根据每批次训练128个样本 计算出一共需要迭代多少次
+    #     batch_count=int(math.ceil(y_train.shape[0]/128.0))
+    #     #开始迭代训练样本
+    #     for e in range(epochs):
+    #
+    #         #每个样本都需要在tensorflow的会话中进行运算和训练
+    #         for batch_i in range(batch_count):
+    #
+    #             #样本的索引,间隔是128个
+    #             batch_start =batch_i *batch_size
+    #             #取出图像样本
+    #             batch_x=x_train[batch_start:batch_start + batch_size]
+    #
+    #             #取出图像对应的标签
+    #
+    #             batch_y=y_train[batch_start:batch_start+batch_size]
+    #
+    #             #训练模型
+    #             loss,_ =sess.run([cost,optimizer],feed_dict={x:batch_x,y_:batch_y})
+    #
+    #             ##每训练20次图像后打印一次日志信息
+    #             if batch_i %20 ==0:
+    #                 print("Epoch: {}/{}".format(e+1,epochs),"Iteration:{}".format(iteration),"Training loss: {:.5f}".format(loss))
+    #
+    #             iteration+=1
+    #
+    #             ##每训练128个样本,验证一下训练的模型效果如何,并输出日志
+    #             if iteration % batch_size ==0 :
+    #                 print(iteration)
+    #                 # correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_, 1))
+    #                 # print(correct_prediction)
+    #                 # ##计算预测准确率
+    #                 # accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    #                 valid_acc=sess.run(accuracy,feed_dict={x:x_valid,y_:y_valid})
+    #                 #valid_acc =sess.run(accuracy,feed_dict=valid_feed_dict)
+    #                 print("Epoch: {}/{}".format(e, epochs), "Iteration:{}".format(iteration),
+    #                       "Validation accuracy: {:.5f}".format(valid_acc))
+    #
+    #     saver.save(sess,"modelstf/mnist_mlp_tf.ckpt")
+
+
+
+        #初始化全局变量
 
 
 
 
+#验证模型最后一次最佳点
+def test_model(accuracy,test_feed_dict):
+    saver=tf.train.Saver()
+    with tf.Session() as sess:
+        #从训练点恢复
+        saver.restore(sess,tf.train.latest_checkpoint('modelstf'))
 
+        #预测测试数据集样本的精确度
+        test_acc =sess.run(accuracy,feed_dict=test_feed_dict)
+        print("test accuracy:{:.5f}".format(test_acc))
 
 
 
